@@ -1,6 +1,8 @@
+using IssueStock.Demo.API.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,6 +27,15 @@ namespace IssueStock.Demo.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddDbContext<StockContext>(item => item.UseSqlServer(Configuration.GetConnectionString("DefaultDatabase")));
+
+            services.AddAuthentication("Bearer")
+            .AddIdentityServerAuthentication("Bearer", options =>
+            {
+                options.ApiName = "stockApi";
+                options.Authority = "https://localhost:44399";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +47,8 @@ namespace IssueStock.Demo.API
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
