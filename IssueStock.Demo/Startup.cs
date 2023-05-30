@@ -1,5 +1,7 @@
+using IssueStock.Demo.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,15 @@ namespace IssueStock.Demo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            // Adding static resources. Only for development and demo purposes only. can use in prod if the configs rarly change with time
+            services.AddIdentityServer()
+                    .AddInMemoryClients(IdentityConfiguration.Clients)
+                    .AddInMemoryIdentityResources(IdentityConfiguration.IdentityResources)
+                    .AddInMemoryApiResources(IdentityConfiguration.ApiResources)
+                    .AddInMemoryApiScopes(IdentityConfiguration.ApiScopes)
+                    .AddTestUsers(IdentityConfiguration.TestUsers)
+                    .AddDeveloperSigningCredential();  // for development purposes 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,11 +56,14 @@ namespace IssueStock.Demo
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseIdentityServer();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Stock.Demo Identity Server Works!");
+                });
             });
         }
     }
