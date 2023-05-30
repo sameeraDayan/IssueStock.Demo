@@ -1,4 +1,5 @@
 using IssueStock.Demo.API.Models;
+using IssueStock.Demo.API.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,9 @@ namespace IssueStock.Demo.API
 
             services.AddDbContext<StockContext>(item => item.UseSqlServer(Configuration.GetConnectionString("DefaultDatabase")));
 
+            // register 
+            services.AddScoped<IDataRepository<StockItem>, StockDataRepository>();
+           
             services.AddAuthentication("Bearer")
             .AddIdentityServerAuthentication("Bearer", options =>
             {
