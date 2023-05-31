@@ -1,5 +1,6 @@
 ﻿using IssueStock.Demo.API.Models;
 using IssueStock.Demo.API.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -22,6 +23,7 @@ namespace IssueStock.Demo.API.Controllers
         /// <returns></returns>
         /// GET: api/Stock
         [HttpGet]
+        [Authorize(Roles = "Admin,User,Auditor")]
         public IActionResult Get()
         {
             IEnumerable<StockItem> stockItems = _dataRepository.GetAll();
@@ -35,6 +37,7 @@ namespace IssueStock.Demo.API.Controllers
         /// <returns></returns>
         /// GET: api/Stock/5
         [HttpGet("{id}", Name = "Get")]
+        [Authorize(Roles = "Admin,User,Auditor")]
         public IActionResult Get(int id)
         {
             var stockItem = _dataRepository.Get(id);
@@ -53,6 +56,7 @@ namespace IssueStock.Demo.API.Controllers
         /// <returns></returns>
         /// POST: api/Stock
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Post([FromBody] StockItem stockItem)
         {
             if (stockItem == null)
@@ -74,6 +78,7 @@ namespace IssueStock.Demo.API.Controllers
         /// <returns></returns>
         /// PUT: api/Stock/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Auditor")]
         public IActionResult Put(int id, [FromBody] StockItem stockItem)
         {
             if (stockItem == null)
@@ -86,24 +91,5 @@ namespace IssueStock.Demo.API.Controllers
             _dataRepository.Update(stockItemToUpdate, stockItem);
             return NoContent();
         }
-
-        /// <summary>
-        /// Delete
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// DELETE: api/Stock/5
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var stockItem = _dataRepository.Get(id);
-
-            if (stockItem == null)
-                return NotFound("The Stock item record couldn't be found.");
-
-            _dataRepository.Delete(stockItem);
-            return NoContent();
-        }
-
     }
 }

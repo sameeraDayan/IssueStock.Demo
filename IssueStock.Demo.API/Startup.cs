@@ -38,8 +38,11 @@ namespace IssueStock.Demo.API
             .AddIdentityServerAuthentication("Bearer", options =>
             {
                 options.ApiName = "stockApi";
-                options.Authority = "https://localhost:44399";
+                options.RequireHttpsMetadata = false;
+                options.Authority = "https://localhost:5001/";
             });
+
+            services.AddAuthorization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
