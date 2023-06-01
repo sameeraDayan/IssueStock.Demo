@@ -3,6 +3,7 @@ using IssueStock.Demo.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IssueStock.Demo.API.Controllers
 {
@@ -24,9 +25,9 @@ namespace IssueStock.Demo.API.Controllers
         /// GET: api/Stock
         [HttpGet]
         [Authorize(Roles = "Admin,User,Auditor")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            IEnumerable<StockItem> stockItems = _dataRepository.GetAll();
+            IEnumerable<StockItem> stockItems = await _dataRepository.GetAllAsync();
             return Ok(stockItems);
         }
 
@@ -37,10 +38,10 @@ namespace IssueStock.Demo.API.Controllers
         /// <returns></returns>
         /// GET: api/Stock/5
         [HttpGet("{id}", Name = "Get")]
-        [Authorize(Roles = "Admin,User,Auditor")]
-        public IActionResult Get(int id)
+        //[Authorize(Roles = "Admin,User,Auditor")]
+        public async Task<IActionResult> Get(int id)
         {
-            var stockItem = _dataRepository.Get(id);
+            var stockItem = await _dataRepository.GetAsync(id);
             if (stockItem == null)
             {
                 return NotFound("The StockItem record couldn't be found.");
@@ -57,12 +58,12 @@ namespace IssueStock.Demo.API.Controllers
         /// POST: api/Stock
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Post([FromBody] StockItem stockItem)
+        public async Task<IActionResult> Post([FromBody] StockItem stockItem)
         {
             if (stockItem == null)
                 return BadRequest("StockItem is null.");
 
-            _dataRepository.Add(stockItem);
+            await _dataRepository.AddAsync(stockItem);
 
             return CreatedAtRoute(
                   "Get",
@@ -79,17 +80,21 @@ namespace IssueStock.Demo.API.Controllers
         /// PUT: api/Stock/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Auditor")]
-        public IActionResult Put(int id, [FromBody] StockItem stockItem)
+        public async Task<IActionResult> Put(int id, [FromBody] StockItem stockItem)
         {
             if (stockItem == null)
                 return BadRequest("StockItem is not available.");
-            
-            var stockItemToUpdate = _dataRepository.Get(id);
+
+            var stockItemToUpdate = await _dataRepository.GetAsync(id);
             if (stockItemToUpdate == null)
                 return NotFound("The Stock item record couldn't be found.");
 
-            _dataRepository.Update(stockItemToUpdate, stockItem);
-            return NoContent();
+            await _dataRepository.UpdateAsync(stockItemToUpdate, stockItem);
+
+            return CreatedAtRoute(
+                  "Get",
+                  new { Id = stockItem.Id },
+                  stockItem);
         }
     }
 }

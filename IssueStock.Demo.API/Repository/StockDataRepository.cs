@@ -1,6 +1,8 @@
 ﻿using IssueStock.Demo.API.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace IssueStock.Demo.API.Repository
 {
@@ -13,36 +15,30 @@ namespace IssueStock.Demo.API.Repository
             _stockContext = stockContext;
         }
 
-        public void Add(StockItem entity)
+        public async Task AddAsync(StockItem entity)
         {
-            _stockContext.StockItem.Add(entity);
-            _stockContext.SaveChanges();
+            await _stockContext.StockItem.AddAsync(entity);
+            await _stockContext.SaveChangesAsync();
         }
 
-        public void Delete(StockItem entity)
+        public async Task<StockItem> GetAsync(int id)
         {
-            _stockContext.StockItem.Remove(entity);
-            _stockContext.SaveChanges();
+            return await _stockContext.StockItem
+                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public StockItem Get(int id)
+        public async Task<IEnumerable<StockItem>> GetAllAsync()
         {
-            return _stockContext.StockItem
-                 .FirstOrDefault(e => e.Id == id);
+            return await _stockContext.StockItem.ToListAsync();
         }
 
-        public IEnumerable<StockItem> GetAll()
-        {
-            return _stockContext.StockItem.ToList();
-        }
-
-        public void Update(StockItem dbEntity, StockItem entity)
+        public async Task UpdateAsync(StockItem dbEntity, StockItem entity)
         {
             dbEntity.Code = entity.Code;
             dbEntity.Description = entity.Description;
             dbEntity.Name = entity.Name;
 
-            _stockContext.SaveChanges();
+            await _stockContext.SaveChangesAsync();
         }
     }
 }

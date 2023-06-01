@@ -7,14 +7,12 @@ namespace IssueStock.Demo.API.Repository
 {
     public interface IDataRepository<TEntity>
     {
-        IEnumerable<TEntity> GetAll();
+        Task<IEnumerable<TEntity>> GetAllAsync();
 
-        TEntity Get(int id);
+        Task<TEntity> GetAsync(int id);
 
-        void Add(TEntity entity);
+        Task AddAsync(TEntity entity);
 
-        void Update(TEntity dbEntity, TEntity entity);
-
-        void Delete(TEntity entity);
+        Task UpdateAsync(TEntity dbEntity, TEntity entity);
     }
 }
